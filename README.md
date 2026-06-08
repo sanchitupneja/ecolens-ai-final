@@ -77,6 +77,8 @@ A digital representation of the user's lifestyle that:
 ---
 
 ### 📊 Carbon Dashboard
+<img width="1482" height="732" alt="image" src="https://github.com/user-attachments/assets/60dd6dcf-04d4-45d0-864d-53cf39c3141a" />
+
 
 Interactive dashboard providing:
 
@@ -100,6 +102,8 @@ AI-powered scanning system that can:
 ---
 
 ### 💬 Twin Chat Assistant
+<img width="1486" height="768" alt="image" src="https://github.com/user-attachments/assets/ac7395a3-6a13-475e-8e47-d9f065790f49" />
+
 
 Intelligent sustainability assistant that:
 
