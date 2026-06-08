@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; // eslint-disable-line no-unused-vars
 import { mockLeagues } from '../data/mockData';
 
 function Leagues({ ecoCredits, setEcoCredits, streakShields, setStreakShields }) {

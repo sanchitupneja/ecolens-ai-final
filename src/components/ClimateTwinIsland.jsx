@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'; // eslint-disable-line no-unused-vars
 
 function ClimateTwinIsland({ actions, carbonSaved }) {
   // Determine number of trees based on actions

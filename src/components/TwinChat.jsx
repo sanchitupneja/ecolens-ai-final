@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react'; // eslint-disable-line no-unused-vars
 import { mockChatTemplates } from '../data/mockData';
 
 function TwinChat({ chatMessages, setChatMessages }) {

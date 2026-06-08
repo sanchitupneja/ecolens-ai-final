@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; // eslint-disable-line no-unused-vars
 import { mockReceipts, mockWasteItems } from '../data/mockData';
 
 function VisionScanner({ addCarbonSaved, addWasteDiverted, addCredits, addXp }) {
@@ -26,7 +26,7 @@ function VisionScanner({ addCarbonSaved, addWasteDiverted, addCredits, addXp }) 
     }, 1500);
   };
 
-  const handleApplyAlternative = (carbonReduced, name) => {
+  const handleApplyAlternative = (carbonReduced) => {
     if (actionApplied) return;
     addCarbonSaved(carbonReduced);
     addCredits(30);
@@ -213,7 +213,7 @@ function VisionScanner({ addCarbonSaved, addWasteDiverted, addCredits, addXp }) 
                     Swap Organic Ribeye Steak for Plant-Based Meatballs on your next supermarket trip.
                   </p>
                   <button 
-                    onClick={() => handleApplyAlternative(11.2, "Ribeye Swap")}
+                    onClick={() => handleApplyAlternative(11.2)}
                     disabled={actionApplied}
                     className="btn-primary" 
                     style={{ width: '100%', padding: '8px', fontSize: '11.5px', background: actionApplied ? 'var(--bg-secondary)' : 'linear-gradient(135deg, var(--accent-emerald), #059669)', border: actionApplied ? '1px solid var(--border-light)' : 'none', color: actionApplied ? 'var(--text-muted)' : 'white' }}
@@ -233,7 +233,7 @@ function VisionScanner({ addCarbonSaved, addWasteDiverted, addCredits, addXp }) 
                     Select Oat Milk instead of Whole Milk dairy for your daily Latte.
                   </p>
                   <button 
-                    onClick={() => handleApplyAlternative(0.7, "Oat Milk Swap")}
+                    onClick={() => handleApplyAlternative(0.7)}
                     disabled={actionApplied}
                     className="btn-primary" 
                     style={{ width: '100%', padding: '8px', fontSize: '11.5px', background: actionApplied ? 'var(--bg-secondary)' : 'linear-gradient(135deg, var(--accent-emerald), #059669)', border: actionApplied ? '1px solid var(--border-light)' : 'none', color: actionApplied ? 'var(--text-muted)' : 'white' }}

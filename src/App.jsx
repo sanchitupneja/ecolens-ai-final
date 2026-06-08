@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; // eslint-disable-line no-unused-vars
 import Dashboard from './components/Dashboard';
 import TwinChat from './components/TwinChat';
 import VisionScanner from './components/VisionScanner';
@@ -13,7 +13,7 @@ function App() {
   const [waterSaved, setWaterSaved] = useState(4200);   // in Liters
   const [wasteDiverted, setWasteDiverted] = useState(22.8); // in kg
   const [ecoCredits, setEcoCredits] = useState(420);    // Credits balance
-  const [streakDays, setStreakDays] = useState(14);
+  const streakDays = 14; // Static streak days value
   const [streakShields, setStreakShields] = useState(1);
   const [level, setLevel] = useState(8);
   const [xp, setXp] = useState(320); // out of 500 XP to next level
