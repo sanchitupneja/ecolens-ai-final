@@ -63,6 +63,27 @@ EcoLens AI focuses on long-term behavior change through:
 - AI-driven recommendations
 - Visual environmental feedback
 
+## Challenge Alignment
+
+EcoLens AI is architected to explicitly address all objectives of the PromptWars Challenge: *Design a solution that helps individuals understand, track, and reduce their carbon footprint through simple actions and personalized insights.*
+
+### Understand
+*   **Climate Twin (3D SVG)**: Translates raw carbon metrics into a living, responsive ecosystem. As emissions change, the digital twin island adjusts its smog levels, sea levels, and vegetation density, giving users an immediate visual understanding of lifestyle environmental impacts.
+*   **AI Coach Chat**: Provides interactive sustainability simulations and forecasts. Users can ask questions about home energy or transportation adjustments and receive a 10-year cumulative projection.
+*   **LCA Carbon Indexes**: The scanner highlights Life Cycle Assessment (LCA) numbers for specific items, educating users on emission drivers.
+
+### Track
+*   **Vitals Dashboard**: Automates carbon accounting by showing real-time statistics (Current Month emissions, remaining carbon budget) and converting them into real-world analogies (tree-years, showers saved, plastic bottles avoided).
+*   **Simulated Receipt OCR**: Emulates reading and parsing receipts to extract item-specific greenhouse coefficients, allowing users to track emissions dynamically.
+*   **Neighborhood Leagues**: Logs cumulative experience points (XP) to track local/regional user standings and active logging streaks.
+
+### Reduce
+*   **Context-Aware Habit Cards**: Offers immediate carbon reduction actions (Community Solar, cycling commutes, thermostat tweaks, vegetarian meal swaps) that users can toggle to instantly decrease their active carbon counters.
+*   **Eco-Alternative Marketplace**: Translates digital progress into physical carbon reduction by allowing users to redeem Eco-Credits (CC) for discounts on E-bikes, smart energy plugs, and local community solar shares.
+*   **Challenges & Streak Protection**: Encourages continuous habit upkeep by offering gamified streak safeguards.
+
+---
+
 ## Key Features
 
 ### 🤖 AI Climate Twin

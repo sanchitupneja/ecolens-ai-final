@@ -1,32 +1,42 @@
-import React, { useState } from 'react'; // eslint-disable-line no-unused-vars
-import Dashboard from './components/Dashboard';
-import TwinChat from './components/TwinChat';
-import VisionScanner from './components/VisionScanner';
-import Leagues from './components/Leagues';
-import Marketplace from './components/Marketplace';
+import React, { useState, Suspense, lazy } from 'react';
+import ErrorBoundary from './components/common/ErrorBoundary';
+import LoadingSpinner from './components/common/LoadingSpinner';
+import { useXPProgress } from './hooks/useXPProgress';
+import { useCarbonActions } from './hooks/useCarbonActions';
 
+// Lazy load route tabs to reduce initial bundle weight
+const Dashboard = lazy(() => import('./components/Dashboard'));
+const TwinChat = lazy(() => import('./components/TwinChat'));
+const VisionScanner = lazy(() => import('./components/VisionScanner'));
+const Leagues = lazy(() => import('./components/Leagues'));
+const Marketplace = lazy(() => import('./components/Marketplace'));
+
+/**
+ * EcoLens AI Main Application Entry.
+ * Implements code splitting, performance optimization, and robust error fallback.
+ */
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   
-  // Core User Metrics State
-  const [carbonSaved, setCarbonSaved] = useState(182.4); // in kg
-  const [waterSaved, setWaterSaved] = useState(4200);   // in Liters
-  const [wasteDiverted, setWasteDiverted] = useState(22.8); // in kg
-  const [ecoCredits, setEcoCredits] = useState(420);    // Credits balance
-  const streakDays = 14; // Static streak days value
+  // Custom Progression Hook
+  const { level, xp, ecoCredits, addXp, addCredits, setEcoCredits } = useXPProgress();
+  
+  // Custom Habits/Actions Hook
+  const {
+    carbonSaved,
+    waterSaved,
+    wasteDiverted,
+    actions,
+    handleToggleAction,
+    setCarbonSaved,
+    setWasteDiverted
+  } = useCarbonActions({ addXp, addCredits });
+
+  const streakDays = 14; 
   const [streakShields, setStreakShields] = useState(1);
-  const [level, setLevel] = useState(8);
-  const [xp, setXp] = useState(320); // out of 500 XP to next level
+  const [unlockedVouchers, setUnlockedVouchers] = useState({});
 
-  // Active Reduction Actions State (Dashboard Toggles)
-  const [actions, setActions] = useState({
-    solar: false,
-    bike: false,
-    thermostat: false,
-    meat: false
-  });
-
-  // Chatbot State
+  // Chat messages initial state
   const [chatMessages, setChatMessages] = useState([
     {
       sender: 'twin',
@@ -36,131 +46,76 @@ function App() {
     }
   ]);
 
-  // Purchased Vouchers State (Marketplace)
-  const [unlockedVouchers, setUnlockedVouchers] = useState({});
-
-  // XP addition helper
-  const addXp = (amount) => {
-    let newXp = xp + amount;
-    let newLevel = level;
-    while (newXp >= 500) {
-      newXp -= 500;
-      newLevel += 1;
-      // Bonus credits for level up
-      setEcoCredits(prev => prev + 100);
-    }
-    setXp(newXp);
-    setLevel(newLevel);
-  };
-
-  // Toggle dynamic actions from Dashboard
-  const handleToggleAction = (actionKey) => {
-    const isActivating = !actions[actionKey];
-    setActions(prev => ({ ...prev, [actionKey]: isActivating }));
-
-    // Impact coefficients
-    let carbonChange = 0;
-    let waterChange = 0;
-    let creditChange = 0;
-    let xpChange = 0;
-
-    switch (actionKey) {
-      case 'solar':
-        carbonChange = 24.0; // grid solar offset/month base rate
-        creditChange = 60;
-        xpChange = 80;
-        break;
-      case 'bike':
-        carbonChange = 1.8;  // commute trip offset
-        creditChange = 25;
-        xpChange = 30;
-        break;
-      case 'thermostat':
-        carbonChange = 0.8;  // daily smart adjust offset
-        creditChange = 10;
-        xpChange = 15;
-        break;
-      case 'meat':
-        carbonChange = 3.2;  // meal swap offset
-        waterChange = 1200;  // water saved
-        creditChange = 20;
-        xpChange = 25;
-        break;
-      default:
-        break;
-    }
-
-    if (isActivating) {
-      setCarbonSaved(prev => parseFloat((prev + carbonChange).toFixed(1)));
-      if (waterChange > 0) setWaterSaved(prev => prev + waterChange);
-      setEcoCredits(prev => prev + creditChange);
-      addXp(xpChange);
-    } else {
-      setCarbonSaved(prev => parseFloat((prev - carbonChange).toFixed(1)));
-      if (waterChange > 0) setWaterSaved(prev => prev - waterChange);
-      setEcoCredits(prev => Math.max(0, prev - creditChange));
-      setXp(prev => Math.max(0, prev - xpChange)); // Simple reverse xp for demo
-    }
-  };
-
   return (
     <div className="app-container">
       {/* Sidebar Navigation */}
-      <aside className="sidebar">
+      <aside className="sidebar" role="navigation" aria-label="Main navigation menu">
         <div className="logo-container">
-          <div className="logo-icon">🍀</div>
+          <div className="logo-icon" aria-hidden="true">🍀</div>
           <div className="logo-details">
-            <span className="logo-text">TerraTwin</span>
-            <div className="logo-sub">AI Operating System</div>
+            <span className="logo-text">EcoLens AI</span>
+            <div className="logo-sub">Climate Operating System</div>
           </div>
         </div>
 
-        <nav className="nav-links">
-          <li className="nav-item">
-            <button 
-              className={`nav-button ${activeTab === 'dashboard' ? 'active' : ''}`}
-              onClick={() => setActiveTab('dashboard')}
-            >
-              <span className="nav-icon">📊</span> Dashboard
-            </button>
-          </li>
-          <li className="nav-item">
-            <button 
-              className={`nav-button ${activeTab === 'twin-chat' ? 'active' : ''}`}
-              onClick={() => setActiveTab('twin-chat')}
-            >
-              <span className="nav-icon">🤖</span> AI Twin Coach
-            </button>
-          </li>
-          <li className="nav-item">
-            <button 
-              className={`nav-button ${activeTab === 'scanner' ? 'active' : ''}`}
-              onClick={() => setActiveTab('scanner')}
-            >
-              <span className="nav-icon">📷</span> OCR & Waste Scan
-            </button>
-          </li>
-          <li className="nav-item">
-            <button 
-              className={`nav-button ${activeTab === 'leagues' ? 'active' : ''}`}
-              onClick={() => setActiveTab('leagues')}
-            >
-              <span className="nav-icon">🏆</span> Leaderboards
-            </button>
-          </li>
-          <li className="nav-item">
-            <button 
-              className={`nav-button ${activeTab === 'marketplace' ? 'active' : ''}`}
-              onClick={() => setActiveTab('marketplace')}
-            >
-              <span className="nav-icon">🛍️</span> Eco-Marketplace
-            </button>
-          </li>
+        <nav>
+          <ul className="nav-links" style={{ padding: 0, margin: 0, listStyle: 'none' }}>
+            <li className="nav-item">
+              <button 
+                className={`nav-button ${activeTab === 'dashboard' ? 'active' : ''}`}
+                onClick={() => setActiveTab('dashboard')}
+                aria-current={activeTab === 'dashboard' ? 'page' : undefined}
+                aria-label="View Dashboard"
+              >
+                <span className="nav-icon" aria-hidden="true">📊</span> Dashboard
+              </button>
+            </li>
+            <li className="nav-item">
+              <button 
+                className={`nav-button ${activeTab === 'twin-chat' ? 'active' : ''}`}
+                onClick={() => setActiveTab('twin-chat')}
+                aria-current={activeTab === 'twin-chat' ? 'page' : undefined}
+                aria-label="View AI Twin Coach Chat"
+              >
+                <span className="nav-icon" aria-hidden="true">🤖</span> AI Twin Coach
+              </button>
+            </li>
+            <li className="nav-item">
+              <button 
+                className={`nav-button ${activeTab === 'scanner' ? 'active' : ''}`}
+                onClick={() => setActiveTab('scanner')}
+                aria-current={activeTab === 'scanner' ? 'page' : undefined}
+                aria-label="View OCR Scanner"
+              >
+                <span className="nav-icon" aria-hidden="true">📷</span> OCR & Waste Scan
+              </button>
+            </li>
+            <li className="nav-item">
+              <button 
+                className={`nav-button ${activeTab === 'leagues' ? 'active' : ''}`}
+                onClick={() => setActiveTab('leagues')}
+                aria-current={activeTab === 'leagues' ? 'page' : undefined}
+                aria-label="View Leaderboards"
+              >
+                <span className="nav-icon" aria-hidden="true">🏆</span> Leaderboards
+              </button>
+            </li>
+            <li className="nav-item">
+              <button 
+                className={`nav-button ${activeTab === 'marketplace' ? 'active' : ''}`}
+                onClick={() => setActiveTab('marketplace')}
+                aria-current={activeTab === 'marketplace' ? 'page' : undefined}
+                aria-label="View Eco-Marketplace"
+              >
+                <span className="nav-icon" aria-hidden="true">🛍️</span> Eco-Marketplace
+              </button>
+            </li>
+          </ul>
         </nav>
 
         <div className="sidebar-footer">
-          <div className="user-profile-summary">
-            <div className="user-avatar-circle">👩‍💼</div>
+          <div className="user-profile-summary" aria-label="User Profile">
+            <div className="user-avatar-circle" aria-hidden="true">👩‍💼</div>
             <div className="user-details">
               <span className="user-name">Maya Patel</span>
               <span className="user-role">Carbon Pioneer</span>
@@ -170,29 +125,35 @@ function App() {
       </aside>
 
       {/* Main Panel Content */}
-      <main className="main-content">
-        {/* Top Header Metrics bar */}
+      <main className="main-content" id="main-content" tabIndex="-1">
         <header className="top-header">
           <div className="welcome-section">
-            <h1>TerraTwin Ecosystem</h1>
+            <h1>EcoLens AI Ecosystem</h1>
             <p>Welcome back, Maya. Your digital twin is active.</p>
           </div>
 
-          <div className="header-stats">
+          <div className="header-stats" role="region" aria-label="Progression metrics">
             {/* Level & XP */}
-            <div className="header-stat-badge" title="Level Progress - Earn XP to level up!">
-              <span className="stat-badge-icon">🎖️</span>
+            <div className="header-stat-badge" title={`Level ${level} - ${(xp / 500) * 100}% towards next level`} tabIndex="0">
+              <span className="stat-badge-icon" aria-hidden="true">🎖️</span>
               <div className="stat-badge-info">
                 <span className="stat-badge-label">Level {level}</span>
-                <div style={{ width: '80px', height: '6px', background: '#2d3748', borderRadius: '3px', marginTop: '4px', overflow: 'hidden' }}>
+                <div 
+                  role="progressbar"
+                  aria-valuenow={xp}
+                  aria-valuemin="0"
+                  aria-valuemax="500"
+                  aria-label="Experience points"
+                  style={{ width: '80px', height: '6px', background: '#2d3748', borderRadius: '3px', marginTop: '4px', overflow: 'hidden' }}
+                >
                   <div style={{ width: `${(xp / 500) * 100}%`, height: '100%', background: '#10b981', transition: 'width 0.4s ease' }}></div>
                 </div>
               </div>
             </div>
 
             {/* Streak */}
-            <div className="header-stat-badge" title="Carbon reduction streak">
-              <span className="stat-badge-icon animate-bounce-slow">🔥</span>
+            <div className="header-stat-badge" title="Daily logging streak" tabIndex="0">
+              <span className="stat-badge-icon animate-bounce-slow" aria-hidden="true">🔥</span>
               <div className="stat-badge-info">
                 <span className="stat-badge-label">Active Streak</span>
                 <span className="stat-badge-value orange">{streakDays} Days</span>
@@ -200,8 +161,8 @@ function App() {
             </div>
 
             {/* Eco Credits */}
-            <div className="header-stat-badge" title="Spent in Eco-Marketplace">
-              <span className="stat-badge-icon">🍃</span>
+            <div className="header-stat-badge" title="Eco-credits balance" tabIndex="0">
+              <span className="stat-badge-icon" aria-hidden="true">🍃</span>
               <div className="stat-badge-info">
                 <span className="stat-badge-label">Eco-Credits</span>
                 <span className="stat-badge-value emerald">{ecoCredits} CC</span>
@@ -210,50 +171,55 @@ function App() {
           </div>
         </header>
 
-        {/* Tab Routing Panels */}
-        {activeTab === 'dashboard' && (
-          <Dashboard 
-            carbonSaved={carbonSaved}
-            waterSaved={waterSaved}
-            wasteDiverted={wasteDiverted}
-            actions={actions}
-            onToggleAction={handleToggleAction}
-          />
-        )}
-        
-        {activeTab === 'twin-chat' && (
-          <TwinChat 
-            chatMessages={chatMessages}
-            setChatMessages={setChatMessages}
-          />
-        )}
+        {/* Tab Routing Panels wrapped in ErrorBoundary & Suspense */}
+        <ErrorBoundary>
+          <Suspense fallback={<LoadingSpinner />}>
+            {activeTab === 'dashboard' && (
+              <Dashboard 
+                carbonSaved={carbonSaved}
+                waterSaved={waterSaved}
+                wasteDiverted={wasteDiverted}
+                actions={actions}
+                onToggleAction={handleToggleAction}
+              />
+            )}
+            
+            {activeTab === 'twin-chat' && (
+              <TwinChat 
+                chatMessages={chatMessages}
+                setChatMessages={setChatMessages}
+              />
+            )}
 
-        {activeTab === 'scanner' && (
-          <VisionScanner 
-            addCarbonSaved={(kg) => setCarbonSaved(prev => parseFloat((prev + kg).toFixed(1)))}
-            addWasteDiverted={(kg) => setWasteDiverted(prev => parseFloat((prev + kg).toFixed(1)))}
-            addCredits={(amount) => setEcoCredits(prev => prev + amount)}
-            addXp={addXp}
-          />
-        )}
+            {activeTab === 'scanner' && (
+              <VisionScanner 
+                addCarbonSaved={(kg) => setCarbonSaved(prev => parseFloat((prev + kg).toFixed(1)))}
+                addWasteDiverted={(kg) => setWasteDiverted(prev => parseFloat((prev + kg).toFixed(1)))}
+                addCredits={(amount) => addCredits(amount)}
+                addXp={addXp}
+              />
+            )}
 
-        {activeTab === 'leagues' && (
-          <Leagues 
-            ecoCredits={ecoCredits}
-            setEcoCredits={setEcoCredits}
-            streakShields={streakShields}
-            setStreakShields={setStreakShields}
-          />
-        )}
+            {activeTab === 'leagues' && (
+              <Leagues 
+                ecoCredits={ecoCredits}
+                setEcoCredits={setEcoCredits}
+                streakShields={streakShields}
+                setStreakShields={setStreakShields}
+                addXp={addXp}
+              />
+            )}
 
-        {activeTab === 'marketplace' && (
-          <Marketplace 
-            ecoCredits={ecoCredits}
-            setEcoCredits={setEcoCredits}
-            unlockedVouchers={unlockedVouchers}
-            setUnlockedVouchers={setUnlockedVouchers}
-          />
-        )}
+            {activeTab === 'marketplace' && (
+              <Marketplace 
+                ecoCredits={ecoCredits}
+                setEcoCredits={setEcoCredits}
+                unlockedVouchers={unlockedVouchers}
+                setUnlockedVouchers={setUnlockedVouchers}
+              />
+            )}
+          </Suspense>
+        </ErrorBoundary>
       </main>
     </div>
   );

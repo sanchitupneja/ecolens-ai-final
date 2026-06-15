@@ -6,17 +6,19 @@
 import React, { useMemo, useCallback } from 'react';
 
 /**
- * Lazy load a component
- * @param {Function} importFunc - Dynamic import function
- * @param {Object} options - Options (fallback component, etc.)
- * @returns {React.Component} Lazy-loaded component
+ * Lazy load a component without JSX syntax.
+ * 
+ * @param {Function} importFunc - Dynamic import function returning a Promise
+ * @param {Object} [options={}] - Optional configuration
+ * @param {React.ReactNode} [options.fallback] - Loading fallback component
+ * @returns {React.Component} Lazy-loaded React component wrapped in Suspense
  */
 export const lazyLoadComponent = (importFunc, options = {}) => {
   const Component = React.lazy(importFunc);
-  return (props) => (
-    <React.Suspense fallback={options.fallback || <div>Loading...</div>}>
-      <Component {...props} />
-    </React.Suspense>
+  return (props) => React.createElement(
+    React.Suspense,
+    { fallback: options.fallback || React.createElement('div', null, 'Loading...') },
+    React.createElement(Component, props)
   );
 };
 
@@ -74,7 +76,10 @@ export const memoize = (func) => {
 };
 
 /**
- * Calculate carbon metrics efficiently (memoized)
+ * Calculate carbon metrics efficiently (memoized).
+ * 
+ * @param {number} carbonSaved - Saved carbon value in kg CO2
+ * @returns {{ treeYears: string, kmDriven: string }} Object containing tree-years and km driven analogies
  */
 export const calculateCarbonMetrics = memoize((carbonSaved) => {
   return {
@@ -84,7 +89,10 @@ export const calculateCarbonMetrics = memoize((carbonSaved) => {
 });
 
 /**
- * Calculate water metrics efficiently (memoized)
+ * Calculate water metrics efficiently (memoized).
+ * 
+ * @param {number} waterSaved - Saved water value in Liters
+ * @returns {{ showersSaved: string }} Object containing showers saved analogies
  */
 export const calculateWaterMetrics = memoize((waterSaved) => {
   return {
@@ -93,7 +101,10 @@ export const calculateWaterMetrics = memoize((waterSaved) => {
 });
 
 /**
- * Calculate waste metrics efficiently (memoized)
+ * Calculate waste metrics efficiently (memoized).
+ * 
+ * @param {number} wasteDiverted - Diverted waste value in kg
+ * @returns {{ bottlesDiverted: string }} Object containing plastic bottles diverted analogies
  */
 export const calculateWasteMetrics = memoize((wasteDiverted) => {
   return {

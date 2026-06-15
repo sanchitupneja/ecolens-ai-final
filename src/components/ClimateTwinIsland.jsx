@@ -1,6 +1,20 @@
-import React from 'react'; // eslint-disable-line no-unused-vars
+import React, { memo } from 'react';
 
-function ClimateTwinIsland({ actions, carbonSaved }) {
+/**
+ * ClimateTwinIsland component (3D SVG Visualizer).
+ * Visually models user lifestyle impact to help users UNDERSTAND carbon footprint levels.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {Object} props.actions - Active habits toggle state
+ * @param {boolean} props.actions.solar - True if community solar active
+ * @param {boolean} props.actions.bike - True if cycling active
+ * @param {boolean} props.actions.thermostat - True if smart thermostat active
+ * @param {boolean} props.actions.meat - True if meat reduction active
+ * @param {number} props.carbonSaved - Total saved carbon in kg CO2
+ * @returns {React.ReactElement} The ClimateTwinIsland component
+ */
+const ClimateTwinIsland = memo(({ actions, carbonSaved }) => {
   // Determine number of trees based on actions
   let treeCount = 2;
   if (actions.meat) treeCount += 2;
@@ -32,18 +46,39 @@ function ClimateTwinIsland({ actions, carbonSaved }) {
     { cx: 220, cy: 240, r: 10, h: 24 }  // Spawns with meat 2
   ];
 
+  const ecosystemStatus = activeCount === 0 ? 'Threatened' : activeCount <= 2 ? 'Recovering' : 'Flourishing';
+
   return (
-    <div className="glass-card emerald-glow" style={{ padding: '20px', position: 'relative', overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+    <div 
+      className="glass-card emerald-glow" 
+      style={{ padding: '20px', position: 'relative', overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+      role="region"
+      aria-label="Climate Twin interactive status map"
+    >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
         <h3 style={{ fontSize: '16px', fontWeight: '700' }}>AI Climate Twin (3D Island)</h3>
-        <span className="badge-status active">
-          Ecosystem: {activeCount === 0 ? 'Threatened' : activeCount <= 2 ? 'Recovering' : 'Flourishing'}
+        <span className="badge-status active" aria-live="polite">
+          Ecosystem: {ecosystemStatus}
         </span>
       </div>
 
+      {/* Screen Reader Detailed Visual State */}
+      <span className="sr-only" style={{ position: 'absolute', width: '1px', height: '1px', padding: '0', margin: '-1px', overflow: 'hidden', clip: 'rect(0,0,0,0)', border: '0' }}>
+        The digital twin island represents your ecological footprint. Currently, the ecosystem status is {ecosystemStatus}. 
+        There are {treeCount} trees growing. The community wind turbines are {turbinesActive ? 'spinning rapidly' : 'stationary'}. 
+        Smog levels are at {Math.round(smogOpacity * 100)}% density.
+      </span>
+
       {/* SVG Canvas */}
       <div style={{ flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <svg viewBox="0 0 400 350" style={{ width: '100%', maxHeight: '280px', borderRadius: '12px' }}>
+        <svg 
+          viewBox="0 0 400 350" 
+          style={{ width: '100%', maxHeight: '280px', borderRadius: '12px' }}
+          role="img"
+          aria-label="Isometric illustration of floating digital twin island"
+        >
+          <title>Floating Climate Twin Island</title>
+          <desc>An interactive model depicting clean solar arrays, functional turbines, green vegetation growth, and ocean height variance.</desc>
           <defs>
             {/* Dynamic Sky Gradient */}
             <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -160,6 +195,7 @@ function ClimateTwinIsland({ actions, carbonSaved }) {
       </div>
     </div>
   );
-}
+});
 
+ClimateTwinIsland.displayName = 'ClimateTwinIsland';
 export default ClimateTwinIsland;
